@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TEI Viewer</title>
+  <link rel="stylesheet" href="CETEIcean.css">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    #fileSelector {
+      margin-bottom: 20px;
+      padding: 5px;
+      font-size: 1em;
+    }
+
+    sup.tei-choice-hover {
+      font-size: 0.75em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dropdown for selecting TEI file -->
+  <label for="fileSelector"><strong>Select Document:</strong></label>
+  <select id="fileSelector"></select>
+
+  <!-- TEI output -->
+  <div id="TEI"></div>
+
+  <!-- CETEIcean -->
+  <script src="CETEI.js"></script>
+  <script>
+    var CETEIcean = new CETEI();
+
+    // =============================
+    // CeTEIcean BEHAVIORS
+    // =============================
+    CETEIcean.addBehaviors({
+
+      // This controls the correction hover
+      tei: {
+
+        choice: function(e) {
+          const sic = e.querySelector("tei-sic");
+          const corr = e.querySelector("tei-corr");
+          if (!sic || !corr) return;
+
+          const span = document.createElement("span");
+          span.className = "tei-choice-hover";
+          span.textContent = sic.textContent;
+          span.setAttribute("data-corr", "Correction: " + corr.textContent);
+
+          return span;
+        },
+        // This controls the note superposition hover
+        note: function(e) {
+          const text = e.textContent.trim();
+
+          const sup = document.createElement("sup");
+          sup.className = "tei-choice-hover";
+          sup.textContent = "(n)";
+          sup.setAttribute("data-corr", text);
+
+          return sup;
+        }
+
+      }
+    });
+
+    // =============================
+    // Dropdown file list
+    // =============================
+    const files = {
+      "Vorrede": "11_PV_Vorrede_pres.xml",
+      "Versuch I": "13_PV_Versuch_I_pres.xml",
+      "Versuch II": "14_PV_Versuch_II_pres.xml",
+      "Versuch III": "15_PV_Versuch_III_pres.xml",
+      "Versuch IV": "16_PV_Versuch_IV_pres.xml",
+      "Versuch V": "17_PV_Versuch_V_pres.xml",
+      "Versuch VI": "18_PV_Versuch_VI_pres.xml",
+      "Versuch VII": "19_PV_Versuch_VII_pres.xml",
+      "Versuch VIII": "20_PV_Versuch_VIII_pres.xml",
+      "Versuch IX": "21_PV_Versuch_IX_pres.xml",
+      "Versuch X": "22_PV_Versuch_X_pres.xml",
+      "Versuch XI": "23_PV_Versuch_XI_pres.xml"
+    };
+
+    const selector = document.getElementById("fileSelector");
+    const output = document.getElementById("TEI");
+
+    // Populate dropdown
+    for (const label in files) {
+      const option = document.createElement("option");
+      option.value = files[label];
+      option.textContent = label;
+      selector.appendChild(option);
+    }
+
+    // Function to load TEI file
+    function loadTEI(file) {
+      output.innerHTML = "";  // clear previous document
+
+      CETEIcean.getHTML5(file, function(data) {
+        output.appendChild(data);
+      });
+    }
+
+    // Load first file automatically
+    selector.addEventListener("change", function() {
+      loadTEI(this.value);
+    });
+
+    // Initial load
+    loadTEI(selector.value);
+
+  </script>
+
+</body>
+</html>
